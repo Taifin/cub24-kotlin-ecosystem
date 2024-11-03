@@ -19,6 +19,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor}")
     implementation("io.ktor:ktor-server-auth:${libs.versions.ktor}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.kotlin}")
     implementation(libs.logback)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor}")
     testImplementation(libs.kotlin.test)
