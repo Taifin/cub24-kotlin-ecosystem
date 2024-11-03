@@ -15,3 +15,4 @@ rootProject.name = "cub24-kotlin-ecosystem"
 include(":shared")
 include(":app:androidApp")
 include(":app:desktopApp")
+include(":server")
