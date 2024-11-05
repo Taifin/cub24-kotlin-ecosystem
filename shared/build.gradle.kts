@@ -1,6 +1,8 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("com.android.library")
+    id("org.jetbrains.compose")
 }
 
 repositories {
@@ -14,6 +16,7 @@ android {
     sourceSets.all {
         manifest.srcFile("../app/androidApp/src/main/AndroidManifest.xml")
     }
+
 }
 
 kotlin {
@@ -30,6 +33,12 @@ kotlin {
             dependencies {
                 implementation(libs.ktor.client.core)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization.json)
+
+                implementation(compose.ui)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.components.resources)
             }
         }
         androidMain {

@@ -1,6 +1,9 @@
+import org.gradle.kotlin.dsl.android
+
 plugins {
     kotlin("android")
     id("com.android.application")
+    kotlin("plugin.compose") version "2.0.20" // this version matches your Kotlin version\
 }
 
 repositories {
@@ -22,6 +25,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
     }
     buildFeatures {
         compose = true
@@ -55,4 +59,5 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation("com.android.support:multidex:1.0.3")
 }

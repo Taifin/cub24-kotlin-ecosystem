@@ -3,6 +3,12 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+
+    plugins {
+        kotlin("plugin.compose") version "2.0.20"
+        id("org.jetbrains.compose") version "1.7.0"
     }
 }
 
