@@ -25,8 +25,10 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
         get("/books") {
-            val type = ContentType.parse("application/json")
-            val json = Json.encodeToString(DataController.getBooks())
+            val startIndex = call.request.queryParameters["startIndex"] ?: "0"
+            val pageSize = call.request.queryParameters["pageSize"] ?: "40"
+            val type = ContentType.Application.Json
+            val json = Json.encodeToString(DataController.getBooks(startIndex = startIndex, maxResults = pageSize))
             call.respondText(json, type)
         }
         get("/error-test") {

@@ -1,8 +1,65 @@
 package cub.taifin.data
 
-// TODO: tmp mock
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+
 object DataController {
-    fun getBooks(query: String = "*", startIndex: Int = 0, maxResults: Int = 100): List<Pair<String, String>> {
-        return (1..100).map { "Book$it" to "Author of Book$it" }
+    private val client = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 10000
+        }
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    private const val GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1"
+    private const val GOOGLE_BOOKS_LIST_VOLUMES_ENDPOINT = "/volumes"
+
+    private suspend fun doApiRequest(query: String, startIndex: Int, maxResults: Int): HttpResponse {
+        val request = client.request {
+            method = HttpMethod.Get
+            url {
+                takeFrom(GOOGLE_BOOKS_API_URL)
+                appendPathSegments(GOOGLE_BOOKS_LIST_VOLUMES_ENDPOINT)
+            }
+
+            contentType(ContentType.Application.Json)
+
+            parameter("q", query)
+            parameter("startIndex", startIndex)
+            parameter("maxResults", maxResults)
+        }
+
+        println(request.bodyAsText())
+
+        return request
+    }
+
+    suspend fun getBooks(query: String = "*", startIndex: String = "0", maxResults: String = "40"): List<VolumeDto> {
+        val startIndexInt = try {
+            startIndex.toInt()
+        } catch (e: NumberFormatException) {
+            0
+        }
+
+        val maxResultsInt = try {
+            maxResults.toInt()
+        } catch (e: NumberFormatException) {
+            40
+        }
+
+        val response = doApiRequest(query, startIndexInt, maxResultsInt)
+        val deserializedResponse = response.body<ItemizedResponse<VolumeDto>>()
+        return deserializedResponse.items
     }
 }
