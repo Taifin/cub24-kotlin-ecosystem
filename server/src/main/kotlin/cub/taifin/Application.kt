@@ -26,7 +26,7 @@ fun Application.configureRouting() {
         }
         get("/books") {
             val startIndex = call.request.queryParameters["startIndex"] ?: "0"
-            val pageSize = call.request.queryParameters["pageSize"] ?: "40"
+            val pageSize = call.request.queryParameters["pageSize"] ?: "10"
             val type = ContentType.Application.Json
             val json = Json.encodeToString(DataController.getBooks(startIndex = startIndex, maxResults = pageSize))
             call.respondText(json, type)

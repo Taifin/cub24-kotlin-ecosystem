@@ -39,6 +39,8 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.components.resources)
+
+                implementation(project(":server"))
             }
         }
         androidMain {

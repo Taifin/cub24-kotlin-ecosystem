@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 object DataController {
     private val client = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 10000
+            requestTimeoutMillis = 100000
         }
         install(ContentNegotiation) {
             json(Json {
@@ -40,12 +40,10 @@ object DataController {
             parameter("maxResults", maxResults)
         }
 
-        println(request.bodyAsText())
-
         return request
     }
 
-    suspend fun getBooks(query: String = "*", startIndex: String = "0", maxResults: String = "40"): List<VolumeDto> {
+    suspend fun getBooks(query: String = "*", startIndex: String = "0", maxResults: String = "10"): List<VolumeDto> {
         val startIndexInt = try {
             startIndex.toInt()
         } catch (e: NumberFormatException) {
@@ -55,7 +53,7 @@ object DataController {
         val maxResultsInt = try {
             maxResults.toInt()
         } catch (e: NumberFormatException) {
-            40
+            20
         }
 
         val response = doApiRequest(query, startIndexInt, maxResultsInt)
