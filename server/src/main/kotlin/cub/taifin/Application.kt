@@ -1,6 +1,7 @@
 package cub.taifin
 
-import cub.taifin.data.DataController
+import cub.taifin.controller.BooksController
+import cub.taifin.controller.MoviesController
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -12,12 +13,22 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+internal fun Parameters.intParameterOrDefault(paramName: String, default: Int): Int = try {
+    this[paramName]?.toInt() ?: default
+} catch (e: NumberFormatException) {
+    default
+}
+
 fun Application.configureRouting() {
     install(StatusPages) {
         exception<IllegalStateException> { call, cause ->
             call.respondText("App in illegal state as ${cause.message}")
         }
     }
+
+    val booksController = BooksController()
+    val moviesController = MoviesController(System.getenv("MOVIES_API_TOKEN"))
+
     routing {
         staticResources("/content", "mycontent")
 
@@ -25,11 +36,21 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
         get("/books") {
-            val startIndex = call.request.queryParameters["startIndex"] ?: "0"
-            val pageSize = call.request.queryParameters["pageSize"] ?: "10"
-            val type = ContentType.Application.Json
-            val json = Json.encodeToString(DataController.getBooks(startIndex = startIndex, maxResults = pageSize))
-            call.respondText(json, type)
+            var startIndex = call.request.queryParameters.intParameterOrDefault("startIndex", 0)
+            if (startIndex < 0 || startIndex > 65536) startIndex = 0
+
+            var pageSize = call.request.queryParameters.intParameterOrDefault("pageSize", 100)
+            if (pageSize < 1 || pageSize > 100) pageSize = 100
+
+            val json = Json.encodeToString(booksController.getBooks(offset = startIndex, limit = pageSize))
+            call.respondText(json, ContentType.Application.Json)
+        }
+        get("/movies") {
+            var page = call.request.queryParameters.intParameterOrDefault("page", 1)
+            if (page < 1 || page > 500) page = 1
+
+            val json = Json.encodeToString(moviesController.getMovies(page))
+            call.respondText(json, ContentType.Application.Json)
         }
         get("/error-test") {
             throw IllegalStateException("Too Busy")
