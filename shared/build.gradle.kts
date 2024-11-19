@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -8,6 +10,7 @@ plugins {
 repositories {
     mavenCentral()
     google()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
 android {
@@ -40,12 +43,20 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.components.resources)
 
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.cio)
+
                 implementation(project(":server"))
             }
         }
         androidMain {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation(libs.logback)
             }
         }
     }
