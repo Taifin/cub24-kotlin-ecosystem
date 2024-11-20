@@ -54,9 +54,5 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.kotlinx.coroutines.android)
-    implementation("com.android.support:multidex:1.0.3")
+
 }

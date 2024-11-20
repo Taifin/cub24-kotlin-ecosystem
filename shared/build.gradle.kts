@@ -1,10 +1,7 @@
-import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
     id("com.android.library")
-    id("org.jetbrains.compose")
 }
 
 repositories {
@@ -38,15 +35,15 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
 
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.components.resources)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.ui.util)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.compiler)
+                implementation(libs.compose.runtime)
+
                 implementation(libs.compose.material.icons.core)
                 implementation(libs.compose.material.icons.extended)
-
-                implementation(project.dependencies.platform(libs.androidx.compose.bom))
-
 
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.cio)
@@ -57,6 +54,9 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.multidex)
             }
         }
         jvmMain {

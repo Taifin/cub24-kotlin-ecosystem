@@ -7,9 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,19 +32,23 @@ fun LoopedScrollableList(
     contentIcon: ImageVector,
     producer: suspend (Client, Int) -> List<EntityWithCreators>
 ) {
-    var pageOffset by remember { mutableStateOf(0) }
+    var pageOffset by remember { mutableStateOf(1500) }
+
+    // to avoid double requests when scrolling up and down around trigger point
+    val alreadyRequested by remember { mutableStateOf(mutableSetOf<Int>()) }
+
     val scope = rememberCoroutineScope()
     val items by remember { mutableStateOf(ArrayDeque<EntityWithCreators>()) }
     val listState = rememberLazyListState()
 
     val downUpdateNeeded by derivedStateOf {
         val lastVisibleItem = listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size
-        lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 40
+        lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 30
     }
 
     LaunchedEffect(Unit) {
         items.addAll(producer(client, pageOffset))
-        pageOffset = items.size
+        pageOffset += items.size
     }
 
     LaunchedEffect(downUpdateNeeded) {
@@ -53,15 +57,17 @@ fun LoopedScrollableList(
         // but then downUpdateNeeded becomes false for a moment when LoadingCard appears,
         // as there is one more item; then it is true again, and the effect is not relaunched.
         // the easiest fix is to weaken the condition
-        if (lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 45) {
+        if (pageOffset !in alreadyRequested && lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 35) {
             scope.launch {
                 val visibleItems = listState.layoutInfo.visibleItemsInfo
                 if (visibleItems.isNotEmpty()) {
+                    alreadyRequested.add(pageOffset)
                     val newItems = producer(client, pageOffset)
 
                     pageOffset += newItems.size
                     if (pageOffset >= maxElements) {
                         pageOffset = 0
+                        alreadyRequested.clear()
                     }
 
                     items.addAll(newItems)
@@ -94,7 +100,7 @@ fun LoopedScrollableList(
 fun BooksList(host: String = "http://localhost:8080") =
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
+        color = MaterialTheme.colorScheme.background
     ) {
         LoopedScrollableList(Client(host), 65536, Icons.Filled.Book) { client, offset ->
             val books = client.getBooks(offset)
@@ -106,7 +112,7 @@ fun BooksList(host: String = "http://localhost:8080") =
 fun MoviesList(host: String = "http://localhost:8080") =
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
+        color = MaterialTheme.colorScheme.background
     ) {
         LoopedScrollableList(Client(host), 65536, Icons.Filled.Movie) { client, offset ->
             val books = client.getMovies(page = offset / 40)
@@ -125,7 +131,7 @@ fun ItemCard(
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colors.surface
+        color = MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -148,21 +154,21 @@ fun ItemCard(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h6.copy(
+                    style = MaterialTheme.typography.headlineSmall.copy(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = MaterialTheme.colors.onSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.body2.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = 14.sp
                     ),
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
         }
@@ -176,7 +182,6 @@ fun LoadingCard() {
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
     ) {
         Row(
             modifier = Modifier
@@ -202,6 +207,59 @@ fun LoadingCard() {
                     fontSize = 18.sp,
                     color = Color.Gray
                 )
+            }
+        }
+    }
+}
+
+enum class DisplayMode {
+    BOOKS,
+    MOVIES
+}
+
+@Composable
+fun MovieAndBookApp() {
+    var selectedMode by remember { mutableStateOf(DisplayMode.MOVIES) }
+
+    Column {
+        Box(modifier = Modifier.weight(0.9F)) {
+            when (selectedMode) {
+                DisplayMode.BOOKS -> BooksList()
+                DisplayMode.MOVIES -> MoviesList()
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .weight(0.1F),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = { selectedMode = DisplayMode.MOVIES },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Movie,
+                    contentDescription = "Movie Icon"
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Movies")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = { selectedMode = DisplayMode.BOOKS },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Book,
+                    contentDescription = "Book Icon"
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Books")
             }
         }
     }
