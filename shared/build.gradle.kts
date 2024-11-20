@@ -42,6 +42,11 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.components.resources)
+                implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
+
+                implementation(project.dependencies.platform(libs.androidx.compose.bom))
+
 
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.cio)
