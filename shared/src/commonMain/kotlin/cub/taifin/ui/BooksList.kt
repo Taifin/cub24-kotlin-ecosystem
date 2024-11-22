@@ -32,7 +32,7 @@ fun LoopedScrollableList(
     contentIcon: ImageVector,
     producer: suspend (Client, Int) -> List<EntityWithCreators>
 ) {
-    var pageOffset by remember { mutableStateOf(1500) }
+    var pageOffset by remember { mutableStateOf(0) }
 
     // to avoid double requests when scrolling up and down around trigger point
     val alreadyRequested by remember { mutableStateOf(mutableSetOf<Int>()) }
@@ -43,12 +43,7 @@ fun LoopedScrollableList(
 
     val downUpdateNeeded by derivedStateOf {
         val lastVisibleItem = listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size
-        lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 30
-    }
-
-    LaunchedEffect(Unit) {
-        items.addAll(producer(client, pageOffset))
-        pageOffset += items.size
+        lastVisibleItem >= listState.layoutInfo.totalItemsCount - 30
     }
 
     LaunchedEffect(downUpdateNeeded) {
@@ -57,7 +52,7 @@ fun LoopedScrollableList(
         // but then downUpdateNeeded becomes false for a moment when LoadingCard appears,
         // as there is one more item; then it is true again, and the effect is not relaunched.
         // the easiest fix is to weaken the condition
-        if (pageOffset !in alreadyRequested && lastVisibleItem != 0 && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 35) {
+        if (pageOffset !in alreadyRequested && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 35) {
             scope.launch {
                 val visibleItems = listState.layoutInfo.visibleItemsInfo
                 if (visibleItems.isNotEmpty()) {
@@ -193,7 +188,7 @@ fun LoadingCard() {
                 modifier = Modifier.size(64.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.HourglassTop, "")
+                CircularProgressIndicator()
             }
 
             Spacer(modifier = Modifier.width(16.dp))
