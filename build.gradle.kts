@@ -2,6 +2,8 @@ plugins {
     kotlin("multiplatform") version "2.0.20"
     kotlin("plugin.compose") version "2.0.20"
     id("com.android.application") version "8.5.2"
+
+    id("cub.taifin.projectInfo")
 }
 
 group = "cub.taifin"
@@ -25,4 +27,8 @@ android {
     sourceSets.all {
         manifest.srcFile("app/androidApp/src/main/AndroidManifest.xml")
     }
+}
+
+`project-info` {
+
 }
