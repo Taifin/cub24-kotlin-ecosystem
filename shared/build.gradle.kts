@@ -11,12 +11,14 @@ repositories {
 }
 
 android {
-    namespace="cub.taifin"
+    namespace="cub.taifin.shared"
     compileSdk=35
     sourceSets.all {
         manifest.srcFile("../app/androidApp/src/main/AndroidManifest.xml")
     }
-
+    defaultConfig {
+        minSdk=21
+    }
 }
 
 kotlin {
