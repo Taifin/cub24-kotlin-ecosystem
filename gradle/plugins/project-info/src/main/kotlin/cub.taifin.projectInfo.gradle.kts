@@ -5,9 +5,18 @@ val projectInfo = extensions.create<ProjectInfo>("project-info")
 
 val piGroup = "project-info"
 
-val commitInfoTask = tasks.register<CommitInfo>("commit-info") {
+val prepareCommitInfoTask = tasks.register<PrepareCommitInfo>("prepare-commit-info") {
+    group = piGroup
+    description = "prepare latest commit information"
+}
+
+val commitInfoTask = tasks.register<FileTracker>("commit-info") {
     group = piGroup
     description = "output latest commit information"
+
+    trackedFile = prepareCommitInfoTask.get().outputFile
+
+    dependsOn(prepareCommitInfoTask)
 }
 
 val prepareSourcesInfoTask = tasks.register<PrepareSourcesInfo>("prepare-sources-info") {

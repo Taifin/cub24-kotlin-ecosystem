@@ -1,13 +1,15 @@
 package cub.taifin.projectInfo
 
 import org.eclipse.jgit.api.Git
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.nio.file.Paths
+import kotlin.io.path.writeText
 
-abstract class CommitInfo : DefaultTask() {
-    @InputFiles
+abstract class PrepareCommitInfo : FileOutputTask(Paths.get("commit-info.txt")) {
+    @Internal
     val gitRootDir = project.rootDir
 
     @InputFiles
@@ -30,7 +32,7 @@ abstract class CommitInfo : DefaultTask() {
                 Message: ${commit.fullMessage}
             """.trimIndent()
 
-            logger.lifecycle(commitInfo)
+            outputFile.writeText(commitInfo)
         } catch (e: Exception) {
             logger.error("Unable to fetch information about commits in the repository:\t\n$e")
         }
