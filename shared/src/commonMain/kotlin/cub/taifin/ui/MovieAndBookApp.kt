@@ -14,14 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MovieAndBookApp() {
+fun MovieAndBookApp(host: String = "http://localhost:8080") {
     var selectedMode by remember { mutableStateOf(DisplayMode.MOVIES) }
 
     Column {
         Box(modifier = Modifier.weight(0.9F)) {
             when (selectedMode) {
-                DisplayMode.BOOKS -> BooksList()
-                DisplayMode.MOVIES -> MoviesList()
+                DisplayMode.BOOKS -> BooksList(host)
+                DisplayMode.MOVIES -> MoviesList(host)
             }
         }
 

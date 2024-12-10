@@ -35,7 +35,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/*"
         }
     }
     buildTypes {
@@ -55,5 +55,5 @@ android {
 dependencies {
     implementation(project(":shared"))
     implementation(libs.androidx.activity.compose)
-
+    implementation(libs.logback.android)
 }

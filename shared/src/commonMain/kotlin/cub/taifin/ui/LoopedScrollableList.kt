@@ -29,7 +29,7 @@ fun LoopedScrollableList(
 
     val downUpdateNeeded by derivedStateOf {
         val lastVisibleItem = listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size
-        lastVisibleItem >= listState.layoutInfo.totalItemsCount - 30
+        lastVisibleItem >= listState.layoutInfo.totalItemsCount - 10
     }
 
     LaunchedEffect(downUpdateNeeded) {
@@ -38,7 +38,7 @@ fun LoopedScrollableList(
         // but then downUpdateNeeded becomes false for a moment when LoadingCard appears,
         // as there is one more item; then it is true again, and the effect is not relaunched.
         // the easiest fix is to weaken the condition
-        if (pageOffset !in alreadyRequested && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 35) {
+        if (pageOffset !in alreadyRequested && lastVisibleItem >= listState.layoutInfo.totalItemsCount - 15) {
             scope.launch {
                 val visibleItems = listState.layoutInfo.visibleItemsInfo
                 if (visibleItems.isNotEmpty()) {

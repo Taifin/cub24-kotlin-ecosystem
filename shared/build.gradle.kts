@@ -59,11 +59,12 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.multidex)
+                implementation(libs.logback.android)
             }
         }
         jvmMain {
             dependencies {
-                implementation(libs.logback)
+
             }
         }
     }

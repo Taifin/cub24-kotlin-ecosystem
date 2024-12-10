@@ -19,7 +19,7 @@ fun MoviesList(host: String = "http://localhost:8080") =
         color = MaterialTheme.colorScheme.background
     ) {
         LoopedScrollableList(Client(host), 65536, Icons.Filled.Movie) { client, offset ->
-            val books = client.getMovies(page = offset / 40)
+            val books = client.getMovies(page = offset / 20)
             books.map { EntityWithCreators(it.title, listOf(it.overview)) }
         }
     }

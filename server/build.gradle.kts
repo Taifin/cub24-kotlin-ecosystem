@@ -24,7 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${libs.versions.kotlin}")
-    implementation(libs.logback)
+    compileOnly(libs.logback.classic)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor}")
     testImplementation(libs.kotlin.test)
 }

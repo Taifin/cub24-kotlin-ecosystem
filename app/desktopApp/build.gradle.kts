@@ -16,7 +16,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":shared"))
-                implementation(libs.logback)
+                implementation(libs.logback.classic)
             }
         }
     }
